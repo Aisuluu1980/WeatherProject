@@ -9,7 +9,8 @@ import kg.tutorialapp.weatherproject.models.ForeCast
 //version-версия, не хотим чтобы история сохранялась exportSxchema= false
 @Database(
     entities = [ForeCast::class],
-    version = 0,
+//    верия базы должна быть как минимум 1
+    version = 1,
     exportSchema = false
 )
 @TypeConverters(ModelsConverter::class, CollectionsConverter::class)
