@@ -10,6 +10,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.Observable
 import io.reactivex.Observer
+import kg.tutorialapp.weatherproject.models.ForeCast
+import kg.tutorialapp.weatherproject.storage.ForeCastDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -27,6 +29,8 @@ class MainActivity : AppCompatActivity() {
         }
         btn_show_toast.setOnClickListener {
             Toast.makeText(this, "Hello", Toast.LENGTH_LONG).show()
+//       педаем контекст и вставляем в Dao
+            ForeCastDatabase.getInstance(applicationContext).forecastDao().insert(ForeCast(lat = 21341.000))
         }
     }
     @SuppressLint("CheckResult")

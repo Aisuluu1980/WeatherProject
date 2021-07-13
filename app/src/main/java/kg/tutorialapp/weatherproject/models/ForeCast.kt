@@ -1,8 +1,15 @@
 package kg.tutorialapp.weatherproject.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+//дата класс нужен для использования Room(entity(анотация-таблица))
+@Entity
 data class ForeCast(
+//    ключ уникальный(не может быть копий) генерируется автоматически
+    @PrimaryKey(autoGenerate = true)
+    val id: Long? = null,
     var lat: Double? = null,
     var lon: Double? = null,
     var timezone: String? = null,
