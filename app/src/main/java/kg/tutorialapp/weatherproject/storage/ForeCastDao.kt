@@ -1,7 +1,6 @@
 package kg.tutorialapp.weatherproject.storage
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
 import androidx.room.*
 import io.reactivex.Completable
 import io.reactivex.Single
