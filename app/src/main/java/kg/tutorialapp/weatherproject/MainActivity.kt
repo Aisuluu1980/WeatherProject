@@ -11,11 +11,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private var workResult = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        fetchWeatherUsingQuery()
+//        fetchWeatherUsingQuery()
+        setup()
     }
 
     private fun fetchWeatherUsingQuery() {
@@ -35,4 +38,27 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+    private fun setup() {
+        btn_start.setOnClickListener {
+            doSomeWork()
+        }
+        btn_show_toast.setOnClickListener {
+            Toast.makeText(this, "Hello", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun doSomeWork() {
+//        создание потока
+        Thread(Runnable {
+            for (i in 0..4) {
+//                имитация сна 4 секунды
+                Thread.sleep(1000)
+                workResult++
+            }
+            runOnUiThread {
+                tv_counter.text = workResult.toString()
+            }
+        }).start()
+    }
 }
+
