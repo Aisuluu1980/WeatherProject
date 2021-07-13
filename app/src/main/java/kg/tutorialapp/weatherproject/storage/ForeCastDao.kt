@@ -11,7 +11,8 @@ import kg.tutorialapp.weatherproject.models.ForeCast
 //для Room кроме Entuty нужен также интерфейс Dao
 @Dao
 interface ForeCastDao {
-    @Insert
+//    если одинаковый id перезаписать, без удаления, для этого нужно OnConflictStrategy
+    @Insert (onConflict = OnConflictStrategy.REPLACE)
     fun insert(forecast: ForeCast)
 //    fun insert(forecast: List<ForeCast>): Completable  можно передавать список элементов для добавления, удаления и редактирования
 //    вставляем(добавляю) в базу новый обьект , но нам не важен результат, поэтому Completable
@@ -26,7 +27,7 @@ interface ForeCastDao {
 
     //может делать все что угодно, getAll достает все, вернет Single список(list) из ForeCast
     @Query("select * from ForeCast")
-    fun getAll(): LiveData<List<ForeCast>>
+    fun getAll(): LiveData<ForeCast>
 
 //достает обьект по его id по всем  полям , выводит данные id, остальное покажет как null
     @Query("select * from ForeCast where id = :id")

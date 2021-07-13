@@ -7,12 +7,13 @@ import com.google.gson.annotations.SerializedName
 //дата класс нужен для использования Room(entity(анотация-таблица))
 @Entity
 data class ForeCast(
-//    ключ уникальный(не может быть копий) генерируется автоматически
-    @PrimaryKey(autoGenerate = true)
+
     val id: Long? = null,
     var lat: Double? = null,
     var lon: Double? = null,
-    var timezone: String? = null,
+
+    @PrimaryKey
+    var timezone: String,
     var timezone_offset: Long? = 0L,
     var current: CurrentForeCast? = null,
     var hourly: List<HourlyForeCast>? = null,
