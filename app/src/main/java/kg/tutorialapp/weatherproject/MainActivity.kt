@@ -1,64 +1,92 @@
 package kg.tutorialapp.weatherproject
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
-import kg.tutorialapp.weatherproject.models.ForeCast
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.Observable
+import io.reactivex.Observer
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
-
-    private var workResult = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        fetchWeatherUsingQuery()
         setup()
     }
 
-    private fun fetchWeatherUsingQuery() {
-        val call = WeatherClient.weatherApi.fetchWeatherUsingQuery(lat = 42.8746, lon = 74.5698)
-        call.enqueue(object : Callback<ForeCast> {
-            override fun onResponse(call: Call<ForeCast>, response: Response<ForeCast>) {
-                if (response.isSuccessful) {
-                    val foreCast = response.body()
-                    foreCast?.let {
-                        textView.text = it.current?.temp.toString()
-                        textView2.text = it.current?.weather!![0].description
-                    }
-                }
-            }
-            override fun onFailure(call: Call<ForeCast>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_LONG).show()
-            }
-        })
-    }
     private fun setup() {
         btn_start.setOnClickListener {
-            doSomeWork()
+            makeRxCall()
         }
         btn_show_toast.setOnClickListener {
             Toast.makeText(this, "Hello", Toast.LENGTH_LONG).show()
         }
     }
+    @SuppressLint("CheckResult")
+    private fun makeRxCall() {
+        WeatherClient.weatherApi.fetchWeather()
+//                на io потоке отправляем запрос на сервер, на глвном потоке(mainThread) нельзя отправлять запрос
+            .subscribeOn(Schedulers.io())
+//                на главном потоке получим данные и отправим на Textview
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+//                с потока получим данные, то и получим текст
+                textView.text = it.current?.temp.toString()
+                textView2.text = it.current?.weather!![0].description
+            }, {
+//                если выйдет ошибка, показать тост
+                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+            })
+    }
+    //just, create, fromCallable(), fromIterable() -создание observable
+    //disposable, compositeDisposable, clear(), dispose()
+    //map, flatmap, zip
 
     private fun doSomeWork() {
-//        создание потока
-        Thread(Runnable {
-            for (i in 0..4) {
-//                имитация сна 4 секунды
-                Thread.sleep(1000)
-                workResult++
+//        создание Observable
+        val observable = Observable.create<String>  { emitter->
+            Log.d(TAG, "${Thread.currentThread().name} starting emitting")
+//            имитация тяжелой работы
+            Thread.sleep(3000)
+//            onNext выдаст сообщение
+            emitter.onNext("Hello")
+            Thread.sleep(1000)
+            emitter.onNext("Bishkek")
+            emitter.onComplete()
+        }
+//        переменная что будет ожидать
+        val observer = object: Observer<String> {
+            override fun onSubscribe(d: Disposable) {
             }
-            runOnUiThread {
-                tv_counter.text = workResult.toString()
+            override fun onNext(t: String) {
+                Log.d(TAG, "${Thread.currentThread().name} onNext{} $t")
             }
-        }).start()
+            override fun onError(e: Throwable) {
+            }
+            override fun onComplete() {
+            }
+        }
+        observable
+//                специальный поток для тяжелого
+            .subscribeOn(Schedulers.computation())
+            .map {
+//                посмотреть на каком потоке все происходит
+                Log.d(TAG, "${Thread.currentThread().name} starting mapping")
+                it.toUpperCase()
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(observer)
+    }
+    companion object{
+        const val TAG = "Rx"
     }
 }
+
 

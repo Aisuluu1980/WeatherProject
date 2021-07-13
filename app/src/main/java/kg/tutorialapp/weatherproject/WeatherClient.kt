@@ -4,6 +4,7 @@ import kg.tutorialapp.weatherproject.network.WeatherApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object WeatherClient {
@@ -16,10 +17,11 @@ object WeatherClient {
         Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/data/2.5/")
             .addConverterFactory(GsonConverterFactory.create()).client(okHttp)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
     }
 
-    val weatherApi by lazy {
+    val weatherApi: WeatherApi by lazy {
         retrofit.create(WeatherApi::class.java)
     }
 }
