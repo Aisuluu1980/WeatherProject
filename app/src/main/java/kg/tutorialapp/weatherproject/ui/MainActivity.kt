@@ -121,5 +121,8 @@ class MainActivity : AppCompatActivity() {
                 .into(iv_weather_icon)
         }
     }
+    companion object{
+        const val TOKEN = "TOKEN"
+    }
 }
 

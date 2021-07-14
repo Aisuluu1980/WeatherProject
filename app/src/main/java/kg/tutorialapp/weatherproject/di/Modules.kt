@@ -47,7 +47,7 @@ private fun provideHttpClient(): OkHttpClient {
 
 private fun provideRetrofit(httpClient: OkHttpClient) =
     Retrofit.Builder()
-        .baseUrl("https://api.openweathermap.org/data/2.5/")
+        .baseUrl(BuildConfig.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .client(httpClient)
